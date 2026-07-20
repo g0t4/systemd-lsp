@@ -94,12 +94,7 @@ impl SystemdFormatter {
             }
 
             // Handle any other lines (preserve leading indentation, trim trailing)
-            let leading = line
-                .chars()
-                .take_while(|c| c.is_whitespace())
-                .collect::<String>();
-            let other = format!("{}{}", leading, line.trim_end());
-            result.push(other.to_string());
+            result.push(line.trim_end().to_string());
             previous_was_section = false;
             // FYI if previous was a comment, then I'd need previous non-comment line to determine if in a line continuation
             previous_ends_with_linewrap = line.ends_with('\\');
@@ -118,6 +113,15 @@ impl SystemdFormatter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_keep_indent_on_line_wrap() {
+        let formatter = SystemdFormatter::new();
+        let input = "ExecStart=\\\n    /usr/bin/foo\n";
+        let expected = "ExecStart=\\\n    /usr/bin/foo\n";
+        let formatted = formatter.apply_opinionated_formatting(input);
+        assert_eq!(formatted, expected);
+    }
 
     #[test]
     fn test_opinionated_formatting_section_spacing() {
