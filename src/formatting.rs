@@ -51,13 +51,14 @@ impl SystemdFormatter {
 
         // let mut is_continued_line = false; // would need to track line wraps and carry them across comment lines too
         for line in lines.iter() {
-            // FTR trimming the start of a line is a terrible idea because it destroys indentation on line wraps!!!
-            // TODO detect line wrap on prior line and then don't trim in just that case?
-            // OR trim to fixed indent on line wraps?
+            // print!("{}", line.to_string());
+
+            // use pattern matching instead of trim
             let trimmed = line.trim();
 
             // Skip completely empty lines - we'll add them back strategically
-            if trimmed.is_empty() {
+            let is_blank = line.chars().all(|c| c.is_whitespace());
+            if is_blank {
                 continue;
             }
 
