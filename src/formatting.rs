@@ -95,11 +95,10 @@ impl SystemdFormatter {
             }
 
             // Handle any other lines (preserve leading indentation, trim trailing)
-            // IIAC all lines that are continuation of prior end up here too
+            // - currently should only be continuation lines
+            // - and any unrecognized lines (i.e. if new syntax in future)
             result.push(line.trim_end().to_string());
             previous_was_section = false;
-            // FYI if previous was a comment, then I'd need previous non-comment line to determine if in a line continuation
-            // previous_ends_with_linewrap = line.ends_with('\\');
         }
 
         // Join with newlines and ensure file ends with single newline
