@@ -59,7 +59,7 @@ impl SystemdFormatter {
 
             // Handle comments - preserve but clean whitespace
             if trimmed.starts_with('#') {
-                result.push(trimmed.to_string());
+                result.push(line.to_string());
                 continue;
             }
 
