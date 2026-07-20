@@ -70,6 +70,7 @@ impl SystemdFormatter {
                     result.push(String::new());
                 }
 
+                // allow trim start/end of section headers
                 result.push(trimmed.to_string());
                 in_section = true;
                 previous_was_section = true;
