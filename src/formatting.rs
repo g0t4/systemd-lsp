@@ -89,8 +89,13 @@ impl SystemdFormatter {
                 continue;
             }
 
-            // Handle any other lines (preserve them but trim whitespace)
-            result.push(trimmed.to_string());
+            // Handle any other lines (preserve leading indentation, trim trailing)
+            let leading = line
+                .chars()
+                .take_while(|c| c.is_whitespace())
+                .collect::<String>();
+            let other = format!("{}{}", leading, line.trim_end());
+            result.push(other.to_string());
             previous_was_section = false;
         }
 
