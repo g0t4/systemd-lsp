@@ -61,9 +61,9 @@ impl SystemdFormatter {
                 continue;
             }
 
-            // Handle comments - preserve but clean whitespace
-            if trimmed.starts_with('#') {
-                result.push(line.to_string());
+            // comments - only trim trailing whitespace
+            if trimmed.starts_with('#') || trimmed.starts_with(';') {
+                result.push(line.trim_end().to_string());
                 continue;
             }
 
@@ -146,17 +146,17 @@ mod tests {
     }
 
     #[test]
-    fn test_opinionated_formatting_preserves_comments() {
+    fn test_comments_strip_trailing_whitespace() {
         let formatter = SystemdFormatter::new();
-        let input = "# This is a comment\n[Unit]\n# Another comment\nDescription=Test\n";
-        let expected = "# This is a comment\n[Unit]\n# Another comment\nDescription=Test\n";
+        let input = "# comment with whitespace after \n";
+        let expected = "# comment with whitespace after\n";
 
         let formatted = formatter.apply_opinionated_formatting(input);
         assert_eq!(formatted, expected);
     }
 
     #[test]
-    fn test_preserve_leading_whitespace_on_comments() {
+    fn test_comments_preserve_leading_whitespace() {
         let formatter = SystemdFormatter::new();
         // both comment chars `;` and `#`
         let input = "  ; indented comment\n  # indented comment\n";
