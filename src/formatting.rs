@@ -53,14 +53,14 @@ impl SystemdFormatter {
         for line in lines.iter() {
             // print!("{}", line.to_string());
 
-            // use pattern matching instead of trim
-            let trimmed = line.trim();
-
             // Skip completely empty lines - we'll add them back strategically
             let is_blank = line.chars().all(|c| c.is_whitespace());
             if is_blank {
                 continue;
             }
+
+            // use pattern matching instead of trim
+            let trimmed = line.trim();
 
             // comments - only trim trailing whitespace
             if trimmed.starts_with('#') || trimmed.starts_with(';') {
