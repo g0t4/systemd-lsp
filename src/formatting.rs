@@ -49,7 +49,7 @@ impl SystemdFormatter {
         let mut in_section = false;
         let mut previous_was_section = false;
 
-        let mut previous_ends_with_linewrap = false;
+        // let mut is_continued_line = false; // would need to track line wraps and carry them across comment lines too
         for line in lines.iter() {
             // FTR trimming the start of a line is a terrible idea because it destroys indentation on line wraps!!!
             // TODO detect line wrap on prior line and then don't trim in just that case?
@@ -94,10 +94,11 @@ impl SystemdFormatter {
             }
 
             // Handle any other lines (preserve leading indentation, trim trailing)
+            // IIAC all lines that are continuation of prior end up here too
             result.push(line.trim_end().to_string());
             previous_was_section = false;
             // FYI if previous was a comment, then I'd need previous non-comment line to determine if in a line continuation
-            previous_ends_with_linewrap = line.ends_with('\\');
+            // previous_ends_with_linewrap = line.ends_with('\\');
         }
 
         // Join with newlines and ensure file ends with single newline
