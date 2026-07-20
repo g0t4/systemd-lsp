@@ -53,9 +53,12 @@ impl SystemdFormatter {
         for line in lines.iter() {
             // print!("{}", line.to_string());
 
-            // Skip completely empty lines - we'll add them back strategically
             let is_blank = line.chars().all(|c| c.is_whitespace());
             if is_blank {
+                // DO NOT SKIP BLANKS... if you have a line continuation and you skip the blank line after the final line... oh boy... you end up merging the next key=value line with the line continuation
+                // if you leave a blank line then you can always have a trailing \ on the end of every component of a large command (so y ou can rearrange args)
+                //  but strip those blanks and KABOOM
+                result.push("".to_string()); // insert blank
                 continue;
             }
 
@@ -71,9 +74,9 @@ impl SystemdFormatter {
             // Handle section headers
             if trimmed.starts_with('[') && trimmed.ends_with(']') {
                 // Add single blank line before section (except for first section)
-                if in_section || previous_was_section {
-                    result.push(String::new());
-                }
+                // if in_section || previous_was_section {
+                //     result.push(String::new());
+                // }
 
                 // allow trim start/end of section headers
                 result.push(trimmed.to_string());
@@ -125,16 +128,6 @@ mod tests {
     }
 
     #[test]
-    fn test_opinionated_formatting_section_spacing() {
-        let formatter = SystemdFormatter::new();
-        let input = "[Unit]\nDescription=Test\n[Service]\nType=simple\n[Install]\nWantedBy=multi-user.target\n";
-        let expected = "[Unit]\nDescription=Test\n\n[Service]\nType=simple\n\n[Install]\nWantedBy=multi-user.target\n";
-
-        let formatted = formatter.apply_opinionated_formatting(input);
-        assert_eq!(formatted, expected);
-    }
-
-    #[test]
     fn test_opinionated_formatting_no_spaces_around_equals() {
         let formatter = SystemdFormatter::new();
         let input = "[Unit]\nDescription = Test Service\nAfter =  network.target\nWants=   network-online.target\n";
@@ -167,10 +160,10 @@ mod tests {
     }
 
     #[test]
-    fn test_opinionated_formatting_removes_extra_blank_lines() {
+    fn test_leave_all_blank_lines() {
         let formatter = SystemdFormatter::new();
-        let input = "\n\n[Unit]\n\n\nDescription=Test\n\n\n\n[Service]\n\n\nType=simple\n\n\n";
-        let expected = "[Unit]\nDescription=Test\n\n[Service]\nType=simple\n";
+        let input = "\n\n[Unit]\n\n\nDescription=Test\n";
+        let expected = "\n\n[Unit]\n\n\nDescription=Test\n";
 
         let formatted = formatter.apply_opinionated_formatting(input);
         assert_eq!(formatted, expected);
@@ -195,7 +188,7 @@ mod tests {
         let edits = formatter.format_document(&uri, input);
         assert_eq!(edits.len(), 1);
 
-        let expected = "[Unit]\nDescription=Test\n\n[Service]\nType=simple\n";
+        let expected = "[Unit]\nDescription=Test\n[Service]\nType=simple\n";
         assert_eq!(edits[0].new_text, expected);
     }
 
@@ -209,13 +202,4 @@ mod tests {
         assert_eq!(edits.len(), 0);
     }
 
-    #[test]
-    fn test_opinionated_formatting_no_blank_lines_within_sections() {
-        let formatter = SystemdFormatter::new();
-        let input = "[Unit]\nDescription=Test\n\nAfter=network.target\n\n\n[Service]\nType=simple\n\nExecStart=/bin/test\n\nRestart=always\n";
-        let expected = "[Unit]\nDescription=Test\nAfter=network.target\n\n[Service]\nType=simple\nExecStart=/bin/test\nRestart=always\n";
-
-        let formatted = formatter.apply_opinionated_formatting(input);
-        assert_eq!(formatted, expected);
-    }
 }
