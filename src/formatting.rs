@@ -101,6 +101,7 @@ impl SystemdFormatter {
             let other = format!("{}{}", leading, line.trim_end());
             result.push(other.to_string());
             previous_was_section = false;
+            // FYI if previous was a comment, then I'd need previous non-comment line to determine if in a line continuation
             previous_ends_with_linewrap = line.ends_with('\\');
         }
 
