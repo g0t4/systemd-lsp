@@ -46,8 +46,8 @@ impl SystemdFormatter {
     fn apply_opinionated_formatting(&self, content: &str) -> String {
         let lines: Vec<&str> = content.lines().collect();
         let mut result = Vec::new();
-        let mut in_section = false;
-        let mut previous_was_section = false;
+        // let mut in_section = false;
+        // let mut previous_was_section = false;
 
         // let mut is_continued_line = false; // would need to track line wraps and carry them across comment lines too
         for line in lines.iter() {
@@ -80,8 +80,8 @@ impl SystemdFormatter {
 
                 // allow trim start/end of section headers
                 result.push(trimmed.to_string());
-                in_section = true;
-                previous_was_section = true;
+                // in_section = true;
+                // previous_was_section = true;
                 continue;
             }
 
@@ -93,7 +93,7 @@ impl SystemdFormatter {
                 // Opinionated formatting: no spaces around equals
                 let formatted = format!("{}={}", key, value);
                 result.push(formatted);
-                previous_was_section = false;
+                // previous_was_section = false;
                 continue;
             }
 
@@ -101,7 +101,7 @@ impl SystemdFormatter {
             // - currently should only be continuation lines
             // - and any unrecognized lines (i.e. if new syntax in future)
             result.push(line.trim_end().to_string());
-            previous_was_section = false;
+            // previous_was_section = false;
         }
 
         // Join with newlines and ensure file ends with single newline
