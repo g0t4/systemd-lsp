@@ -156,6 +156,17 @@ mod tests {
     }
 
     #[test]
+    fn test_preserve_leading_whitespace_on_comments() {
+        let formatter = SystemdFormatter::new();
+        // both comment chars `;` and `#`
+        let input = "  ; indented comment\n  # indented comment\n";
+        let expected = "  ; indented comment\n  # indented comment\n";
+
+        let formatted = formatter.apply_opinionated_formatting(input);
+        assert_eq!(formatted, expected);
+    }
+
+    #[test]
     fn test_opinionated_formatting_removes_extra_blank_lines() {
         let formatter = SystemdFormatter::new();
         let input = "\n\n[Unit]\n\n\nDescription=Test\n\n\n\n[Service]\n\n\nType=simple\n\n\n";
