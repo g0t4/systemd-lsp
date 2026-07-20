@@ -15,6 +15,8 @@ impl SystemdFormatter {
 
         let formatted_content = self.apply_opinionated_formatting(text);
 
+        // print!("text '{}'", text);
+        // print!("formatted '{}'", formatted_content);
         // If content changed, replace the entire document
         if formatted_content != text {
             vec![TextEdit {
